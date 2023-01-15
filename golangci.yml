@@ -1,0 +1,21 @@
+linters:
+  enable:
+    - unconvert
+    - stylecheck
+    - lll
+    - unparam
+    - goimports
+    - unparam
+    - gofumpt
+    - revive
+    - unconvert
+    - gocognit
+
+  disable:
+    - errcheck
+
+linters-settings:
+  lll:
+    line-length: 130
+  gofumpt:
+    extra-rules: true
