@@ -19,13 +19,13 @@ func TestMain(m *testing.M) {
 
 What `coverage.Run` does, it runes the tests with `t.Run()` and then depending on the coverage fails the tests and calls `os.Exit` with correct exit code.
 
-In case you have "clean" up code after running your tests `coverage.Run` support passing a callback function `func(t *testing.M)` for running your code. 
+In case you have "clean" up code after running your tests `coverage.Run` support passing a callback function `func()` for running your code. 
 
 e.g. 
 
 ```go
 func TestMain(m *testing.M) {
-	coverage.Run(m, 91, func(t *testing.M) {
+	coverage.Run(m, 91, func() {
 		fmt.Println("tests are done")
 	})
 }

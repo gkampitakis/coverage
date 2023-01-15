@@ -2,33 +2,49 @@ package coverage
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"runtime"
 	"strings"
 	"testing"
 )
 
-func Run(t *testing.M, c float64, callbacks ...func(t *testing.M)) {
+type testingM interface {
+	Run() int
+}
+
+var (
+	// used for overriding during unit tests
+	coverModeFunc = testing.CoverMode
+	coverageFunc  = testing.Coverage
+	writer        = io.Writer(os.Stdout)
+	exitFunc      = os.Exit
+)
+
+func Run(t testingM, c float64, callbacks ...func()) {
 	var code int
 	defer func() {
-		os.Exit(code)
+		exitFunc(code)
 	}()
 
 	code = t.Run()
 
-	if testing.CoverMode() == "" {
-		fmt.Printf("\nFAIL    coverage is not enabled. You can enable by using `-cover`\n\n")
+	if coverModeFunc() == "" {
+		fmt.Fprintf(
+			writer,
+			"\nFAIL    coverage is not enabled. You can enable by using `-cover`\n\n",
+		)
 		code = 1
 	} else {
-		coverage := testing.Coverage()
+		coverage := coverageFunc()
 		if coverage*100 < c {
 			code = 1
-			fmt.Printf("\nFAIL    Coverage threshold not met %.1f >= %.1f for %s\n\n", c, coverage*100, packageName())
+			fmt.Fprintf(writer, "\nFAIL    Coverage threshold not met %.1f >= %.1f for %s\n\n", c, coverage*100, packageName())
 		}
 	}
 
 	for _, callback := range callbacks {
-		callback(t)
+		callback()
 	}
 }
 
